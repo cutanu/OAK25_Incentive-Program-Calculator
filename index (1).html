@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAK Marketing Incentive Calculator</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+            color: #34495e;
+        }
+        select, input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #bdc3c7;
+            border-radius: 5px;
+            font-size: 16px;
+            box-sizing: border-box;
+        }
+        button {
+            width: 100%;
+            padding: 12px;
+            background: #3498db;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: background-color 0.3s;
+        }
+        button:hover {
+            background: #2980b9;
+        }
+        button:active {
+            background: #21618c;
+        }
+        select:focus, input:focus {
+            outline: none;
+            border-color: #3498db;
+        }
+        .result {
+            background: #e8f5e8;
+            border: 2px solid #27ae60;
+            border-radius: 8px;
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .result h3 {
+            color: #27ae60;
+            margin-top: 0;
+        }
+        .result .amount {
+            font-size: 24px;
+            font-weight: bold;
+            color: #2c3e50;
+        }
+        .calculation-details {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 15px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+        .note {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin-top: 20px;
+            color: #856404;
+        }
+        .baseline {
+            font-size: 12px;
+            color: #666;
+            margin-top: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        
+<div style="text-align: center; margin-bottom: 30px;">
+    <img src="IFlyOAK_No Tagline_BLK.png" alt="I Fly OAK" style="max-width: 300px; height: auto;">
+    <h1 style="margin: 0; color: #2c3e50; font-size: 24px;">Marketing Incentive Calculator</h1>
+</div>
+
+            <h1 style="margin: 0; color: #2c3e50; font-size: 24px;">Marketing Incentive Calculator</h1>
+        </div>
+        
+        <div class="form-group">
+            <label for="serviceType">Type of Service:</label>
+            <select id="serviceType">
+                <option value="">Select Service Type</option>
+                <option value="domestic">Domestic - New Destination</option>
+                <option value="northamerican">North American International - New Destination (Canada, Mexico, Caribbean, Central America)</option>
+                <option value="international">International - New Destination (not North American)</option>
+                <option value="newentrant">New Entrant Airline Incentive</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="annualFlights">Annual Number of Flights:</label>
+            <input type="number" id="annualFlights" placeholder="Enter number of flights per year" min="1" max="365">
+            <div class="baseline">Base calculation assumes 365 flights per year (daily service)</div>
+        </div>
+
+        <div class="form-group">
+            <button onclick="calculateFunding()">Calculate Eligible Funds</button>
+        </div>
+
+        <div id="result" class="result" style="display: none;">
+            <h3>Eligible Marketing Fund Amount</h3>
+            <div class="amount" id="fundAmount">$0</div>
+            <div class="calculation-details" id="calculationDetails"></div>
+        </div>
+
+        <div class="note">
+            <strong>Note:</strong> This calculator prorates the maximum marketing support based on flight frequency. 
+            The calculation assumes 365 flights per year equals 100% of the maximum support amount.
+            Year 2 amounts are automatically calculated where applicable.
+        </div>
+    </div>
+
+    <script>
+        function calculateFunding() {
+            const serviceType = document.getElementById('serviceType').value;
+            const annualFlights = parseInt(document.getElementById('annualFlights').value);
+            
+            if (!serviceType || !annualFlights || annualFlights <= 0) {
+                document.getElementById('result').style.display = 'none';
+                return;
+            }
+
+            let maxFunding = 0;
+            let serviceName = '';
+            let year2Funding = 0;
+            let hasYear2 = false;
+
+            switch(serviceType) {
+                case 'domestic':
+                    maxFunding = 150000;
+                    serviceName = 'Domestic - New Destination';
+                    break;
+                case 'northamerican':
+                    maxFunding = 400000;
+                    serviceName = 'North American International - New Destination';
+                    year2Funding = 0;
+                    hasYear2 = true;
+                    break;
+                case 'international':
+                    maxFunding = 750000;
+                    serviceName = 'International - New Destination (not North American)';
+                    year2Funding = 750000;
+                    hasYear2 = true;
+                    break;
+                case 'newentrant':
+                    maxFunding = 250000;
+                    serviceName = 'New Entrant Airline Incentive';
+                    break;
+            }
+
+            // Calculate prorated amount based on 365 flights = 100%
+            const proratedAmount = Math.round((annualFlights / 365) * maxFunding);
+            const percentage = Math.round((annualFlights / 365) * 100);
+
+            // Calculate Year 2 if applicable
+            let year2Amount = 0;
+            if (hasYear2) {
+                year2Amount = Math.round((annualFlights / 365) * year2Funding);
+            }
+
+            // Display results
+            document.getElementById('fundAmount').textContent = '$' + proratedAmount.toLocaleString();
+            
+            let detailsHTML = `
+                <strong>Service Type:</strong> ${serviceName}<br>
+                <strong>Annual Flights:</strong> ${annualFlights} (${percentage}% of daily service)<br>
+                <strong>Maximum Available:</strong> $${maxFunding.toLocaleString()}<br>
+                <strong>Prorated Amount (Year 1):</strong> $${proratedAmount.toLocaleString()}
+            `;
+
+            if (hasYear2) {
+                detailsHTML += `<br><strong>Year 2 Amount:</strong> $${year2Amount.toLocaleString()}`;
+            }
+
+            detailsHTML += `<br><br><em>Calculation: ${annualFlights} flights ÷ 365 flights × $${maxFunding.toLocaleString()} = $${proratedAmount.toLocaleString()}</em>`;
+
+            document.getElementById('calculationDetails').innerHTML = detailsHTML;
+            document.getElementById('result').style.display = 'block';
+        }
+    </script>
+</body>
+</html>
